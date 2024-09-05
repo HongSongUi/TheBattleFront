@@ -1,0 +1,330 @@
+﻿Protocol.proto(4,1): warning G1A4DC0EC: Import Enum.proto is unused.
+  #pragma once
+  #include "Protocol.pb.h"
+  
+  #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+  #include "Header_Macro.h"
+  #endif
+  
+  using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>;
+  extern PacketHandlerFunc GPacketHandler[UINT16_MAX];
+  
+  // Utils Func
+  class UNetworkManager* GetWorldNetwork(const PacketSessionRef& Session);
+  
+  enum : uint16
+  {
+  	PKT_C_LOGIN = 1000,
+  	PKT_S_LOGIN = 1001,
+  	PKT_C_ENTER_GAME = 1002,
+  	PKT_S_ENTER_GAME = 1003,
+  	PKT_C_LEAVE_GAME = 1004,
+  	PKT_S_LEAVE_GAME = 1005,
+  	PKT_S_SPAWN = 1006,
+  	PKT_S_DESPAWN = 1007,
+  	PKT_C_MOVE = 1008,
+  	PKT_S_MOVE = 1009,
+  	PKT_C_CHAT = 1010,
+  	PKT_S_CHAT = 1011,
+  	PKT_C_FIRE = 1012,
+  	PKT_S_FIRE = 1013,
+  	PKT_C_HIT = 1014,
+  	PKT_S_HIT = 1015,
+  };
+  
+  // Custom Handlers
+  bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
+  bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt);
+  bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
+  bool Handle_S_LEAVE_GAME(PacketSessionRef& session, Protocol::S_LEAVE_GAME& pkt);
+  bool Handle_S_SPAWN(PacketSessionRef& session, Protocol::S_SPAWN& pkt);
+  bool Handle_S_DESPAWN(PacketSessionRef& session, Protocol::S_DESPAWN& pkt);
+  bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
+  bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt);
+  bool Handle_S_FIRE(PacketSessionRef& session, Protocol::S_FIRE& pkt);
+  bool Handle_S_HIT(PacketSessionRef& session, Protocol::S_HIT& pkt);
+  
+  class ClientPacketHandler
+  {
+  public:
+  	static void Init()
+  	{
+  		for (int32 i = 0; i < UINT16_MAX; i++)
+  			GPacketHandler[i] = Handle_INVALID;
+  		GPacketHandler[PKT_S_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_LOGIN>(Handle_S_LOGIN, session, buffer, len); };
+  		GPacketHandler[PKT_S_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_ENTER_GAME>(Handle_S_ENTER_GAME, session, buffer, len); };
+  		GPacketHandler[PKT_S_LEAVE_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_LEAVE_GAME>(Handle_S_LEAVE_GAME, session, buffer, len); };
+  		GPacketHandler[PKT_S_SPAWN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_SPAWN>(Handle_S_SPAWN, session, buffer, len); };
+  		GPacketHandler[PKT_S_DESPAWN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_DESPAWN>(Handle_S_DESPAWN, session, buffer, len); };
+  		GPacketHandler[PKT_S_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_MOVE>(Handle_S_MOVE, session, buffer, len); };
+  		GPacketHandler[PKT_S_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_CHAT>(Handle_S_CHAT, session, buffer, len); };
+  		GPacketHandler[PKT_S_FIRE] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_FIRE>(Handle_S_FIRE, session, buffer, len); };
+  		GPacketHandler[PKT_S_HIT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_HIT>(Handle_S_HIT, session, buffer, len); };
+  	}
+  
+  	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
+  	{
+  		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
+  		return GPacketHandler[header->id](session, buffer, len);
+  	}
+  	static SendBufferRef MakeSendBuffer(Protocol::C_LOGIN& pkt) { return MakeSendBuffer(pkt, PKT_C_LOGIN); }
+  	static SendBufferRef MakeSendBuffer(Protocol::C_ENTER_GAME& pkt) { return MakeSendBuffer(pkt, PKT_C_ENTER_GAME); }
+  	static SendBufferRef MakeSendBuffer(Protocol::C_LEAVE_GAME& pkt) { return MakeSendBuffer(pkt, PKT_C_LEAVE_GAME); }
+  	static SendBufferRef MakeSendBuffer(Protocol::C_MOVE& pkt) { return MakeSendBuffer(pkt, PKT_C_MOVE); }
+  	static SendBufferRef MakeSendBuffer(Protocol::C_CHAT& pkt) { return MakeSendBuffer(pkt, PKT_C_CHAT); }
+  	static SendBufferRef MakeSendBuffer(Protocol::C_FIRE& pkt) { return MakeSendBuffer(pkt, PKT_C_FIRE); }
+  	static SendBufferRef MakeSendBuffer(Protocol::C_HIT& pkt) { return MakeSendBuffer(pkt, PKT_C_HIT); }
+  
+  private:
+  	template<typename PacketType, typename ProcessFunc>
+  	static bool HandlePacket(ProcessFunc func, PacketSessionRef& session, BYTE* buffer, int32 len)
+  	{
+  		PacketType pkt;
+  		if (pkt.ParseFromArray(buffer + sizeof(PacketHeader), len - sizeof(PacketHeader)) == false)
+  			return false;
+  
+  		return func(session, pkt);
+  	}
+  
+  	template<typename T>
+  	static SendBufferRef MakeSendBuffer(T& pkt, uint16 pktId)
+  	{
+  		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
+  		const uint16 packetSize = dataSize + sizeof(PacketHeader);
+  
+  #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+  		SendBufferRef sendBuffer = MakeShared<SendBuffer>(packetSize);
+  #else
+  		SendBufferRef sendBuffer = GSendBufferManager->Open(packetSize);
+  #endif
+  		PacketHeader* header = reinterpret_cast<PacketHeader*>(sendBuffer->Buffer());
+  		header->size = packetSize;
+  		header->id = pktId;
+  		
+  #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+  		pkt.SerializeToArray(&header[1], dataSize);
+  #else
+  		ASSERT_CRASH(pkt.SerializeToArray(&header[1], dataSize));
+  #endif		
+  		sendBuffer->Close(packetSize);
+  
+  		return sendBuffer;
+  	}
+  };
+  #pragma once
+  #include "Protocol.pb.h"
+  
+  #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+  #include "Header_Macro.h"
+  #endif
+  
+  using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>;
+  extern PacketHandlerFunc GPacketHandler[UINT16_MAX];
+  
+  // Utils Func
+  class UNetworkManager* GetWorldNetwork(const PacketSessionRef& Session);
+  
+  enum : uint16
+  {
+  	PKT_C_LOGIN = 1000,
+  	PKT_S_LOGIN = 1001,
+  	PKT_C_ENTER_GAME = 1002,
+  	PKT_S_ENTER_GAME = 1003,
+  	PKT_C_LEAVE_GAME = 1004,
+  	PKT_S_LEAVE_GAME = 1005,
+  	PKT_S_SPAWN = 1006,
+  	PKT_S_DESPAWN = 1007,
+  	PKT_C_MOVE = 1008,
+  	PKT_S_MOVE = 1009,
+  	PKT_C_CHAT = 1010,
+  	PKT_S_CHAT = 1011,
+  	PKT_C_FIRE = 1012,
+  	PKT_S_FIRE = 1013,
+  	PKT_C_HIT = 1014,
+  	PKT_S_HIT = 1015,
+  };
+  
+  // Custom Handlers
+  bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
+  bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt);
+  bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt);
+  bool Handle_C_LEAVE_GAME(PacketSessionRef& session, Protocol::C_LEAVE_GAME& pkt);
+  bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt);
+  bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt);
+  bool Handle_C_FIRE(PacketSessionRef& session, Protocol::C_FIRE& pkt);
+  bool Handle_C_HIT(PacketSessionRef& session, Protocol::C_HIT& pkt);
+  
+  class ServerPacketHandler
+  {
+  public:
+  	static void Init()
+  	{
+  		for (int32 i = 0; i < UINT16_MAX; i++)
+  			GPacketHandler[i] = Handle_INVALID;
+  		GPacketHandler[PKT_C_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_LOGIN>(Handle_C_LOGIN, session, buffer, len); };
+  		GPacketHandler[PKT_C_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_ENTER_GAME>(Handle_C_ENTER_GAME, session, buffer, len); };
+  		GPacketHandler[PKT_C_LEAVE_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_LEAVE_GAME>(Handle_C_LEAVE_GAME, session, buffer, len); };
+  		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_MOVE>(Handle_C_MOVE, session, buffer, len); };
+  		GPacketHandler[PKT_C_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_CHAT>(Handle_C_CHAT, session, buffer, len); };
+  		GPacketHandler[PKT_C_FIRE] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_FIRE>(Handle_C_FIRE, session, buffer, len); };
+  		GPacketHandler[PKT_C_HIT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_HIT>(Handle_C_HIT, session, buffer, len); };
+  	}
+  
+  	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
+  	{
+  		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
+  		return GPacketHandler[header->id](session, buffer, len);
+  	}
+  	static SendBufferRef MakeSendBuffer(Protocol::S_LOGIN& pkt) { return MakeSendBuffer(pkt, PKT_S_LOGIN); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_ENTER_GAME& pkt) { return MakeSendBuffer(pkt, PKT_S_ENTER_GAME); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_LEAVE_GAME& pkt) { return MakeSendBuffer(pkt, PKT_S_LEAVE_GAME); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_SPAWN& pkt) { return MakeSendBuffer(pkt, PKT_S_SPAWN); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_DESPAWN& pkt) { return MakeSendBuffer(pkt, PKT_S_DESPAWN); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_MOVE& pkt) { return MakeSendBuffer(pkt, PKT_S_MOVE); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_CHAT& pkt) { return MakeSendBuffer(pkt, PKT_S_CHAT); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_FIRE& pkt) { return MakeSendBuffer(pkt, PKT_S_FIRE); }
+  	static SendBufferRef MakeSendBuffer(Protocol::S_HIT& pkt) { return MakeSendBuffer(pkt, PKT_S_HIT); }
+  
+  private:
+  	template<typename PacketType, typename ProcessFunc>
+  	static bool HandlePacket(ProcessFunc func, PacketSessionRef& session, BYTE* buffer, int32 len)
+  	{
+  		PacketType pkt;
+  		if (pkt.ParseFromArray(buffer + sizeof(PacketHeader), len - sizeof(PacketHeader)) == false)
+  			return false;
+  
+  		return func(session, pkt);
+  	}
+  
+  	template<typename T>
+  	static SendBufferRef MakeSendBuffer(T& pkt, uint16 pktId)
+  	{
+  		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
+  		const uint16 packetSize = dataSize + sizeof(PacketHeader);
+  
+  #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+  		SendBufferRef sendBuffer = MakeShared<SendBuffer>(packetSize);
+  #else
+  		SendBufferRef sendBuffer = GSendBufferManager->Open(packetSize);
+  #endif
+  		PacketHeader* header = reinterpret_cast<PacketHeader*>(sendBuffer->Buffer());
+  		header->size = packetSize;
+  		header->id = pktId;
+  		
+  #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+  		pkt.SerializeToArray(&header[1], dataSize);
+  #else
+  		ASSERT_CRASH(pkt.SerializeToArray(&header[1], dataSize));
+  #endif		
+  		sendBuffer->Close(packetSize);
+  
+  		return sendBuffer;
+  	}
+  };
+  F:Enum.pb.h
+  1 File(s) copied
+  F:Enum.pb.cc
+  1 File(s) copied
+  F:Struct.pb.h
+  1 File(s) copied
+  F:Struct.pb.cc
+  1 File(s) copied
+  F:Protocol.pb.h
+  1 File(s) copied
+  F:Protocol.pb.cc
+  1 File(s) copied
+  F:ServerPacketHandler.h
+  1 File(s) copied
+  F:Enum.pb.h
+  1 File(s) copied
+  F:Enum.pb.cc
+  1 File(s) copied
+  F:Struct.pb.h
+  1 File(s) copied
+  F:Struct.pb.cc
+  1 File(s) copied
+  F:Protocol.pb.h
+  1 File(s) copied
+  F:Protocol.pb.cc
+  1 File(s) copied
+  F:ClientPacketHandler.h
+  1 File(s) copied
+  F:Enum.pb.h
+  1 File(s) copied
+  F:Enum.pb.cc
+  1 File(s) copied
+  F:Struct.pb.h
+  1 File(s) copied
+  F:Struct.pb.cc
+  1 File(s) copied
+  F:Protocol.pb.h
+  1 File(s) copied
+  F:Protocol.pb.cc
+  1 File(s) copied
+  F:ClientPacketHandler.h
+  1 File(s) copied
+  F:Enum.proto
+  1 File(s) copied
+  F:Protocol.proto
+  1 File(s) copied
+  F:Struct.proto
+  1 File(s) copied
+  Press any key to continue . . . 
+  pch.cpp
+  ClientPacketHandler.cpp
+  DummyClient.cpp
+  Generating Code...
+  Enum.pb.cc
+  Protocol.pb.cc
+  Struct.pb.cc
+  Generating Code...
+libprotobufd.lib(arenastring.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(arenastring.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(message_lite.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(message_lite.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(generated_message_bases.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(generated_message_bases.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(generated_message_reflection.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(generated_message_reflection.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(message.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(message.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(generated_message_util.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(generated_message_util.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(stringpiece.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(stringpiece.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(common.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(common.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(coded_stream.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(coded_stream.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(arena.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(arena.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(repeated_ptr_field.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(repeated_ptr_field.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(repeated_field.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(repeated_field.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(wire_format_lite.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(wire_format_lite.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(parse_context.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(parse_context.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(unknown_field_set.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(unknown_field_set.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(wire_format.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(wire_format.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(strutil.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(strutil.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(zero_copy_stream.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(zero_copy_stream.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(zero_copy_stream_impl_lite.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(zero_copy_stream_impl_lite.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(zero_copy_stream_impl.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(zero_copy_stream_impl.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(descriptor.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(descriptor.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(extension_set_heavy.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(extension_set_heavy.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(extension_set.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(extension_set.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(map_field.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(map_field.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(reflection_ops.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(reflection_ops.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(status.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(status.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(int128.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(int128.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(implicit_weak_message.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(implicit_weak_message.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(structurally_valid.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(structurally_valid.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(io_win32.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(io_win32.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(text_format.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(text_format.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(descriptor.pb.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(descriptor.pb.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(tokenizer.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(tokenizer.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(stringprintf.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(stringprintf.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(substitute.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(substitute.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(descriptor_database.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(descriptor_database.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(dynamic_message.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(dynamic_message.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(strtod.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(strtod.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(any_lite.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(any_lite.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(map.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(map.obj)' or at ''; linking object as if no debug info
+libprotobufd.lib(any.obj) : warning LNK4099: PDB '' was not found with 'libprotobufd.lib(any.obj)' or at ''; linking object as if no debug info
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_LOGIN(class std::shared_ptr<class PacketSession> &,class Protocol::S_LOGIN &)" (?Handle_S_LOGIN@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_LOGIN@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_1>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_1>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_ENTER_GAME(class std::shared_ptr<class PacketSession> &,class Protocol::S_ENTER_GAME &)" (?Handle_S_ENTER_GAME@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_ENTER_GAME@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_2>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_2>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_LEAVE_GAME(class std::shared_ptr<class PacketSession> &,class Protocol::S_LEAVE_GAME &)" (?Handle_S_LEAVE_GAME@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_LEAVE_GAME@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_3>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_3>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_SPAWN(class std::shared_ptr<class PacketSession> &,class Protocol::S_SPAWN &)" (?Handle_S_SPAWN@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_SPAWN@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_4>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_4>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_DESPAWN(class std::shared_ptr<class PacketSession> &,class Protocol::S_DESPAWN &)" (?Handle_S_DESPAWN@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_DESPAWN@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_5>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_5>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_MOVE(class std::shared_ptr<class PacketSession> &,class Protocol::S_MOVE &)" (?Handle_S_MOVE@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_MOVE@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_6>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_6>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_FIRE(class std::shared_ptr<class PacketSession> &,class Protocol::S_FIRE &)" (?Handle_S_FIRE@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_FIRE@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_8>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_8>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+DummyClient.obj : error LNK2019: unresolved external symbol "bool __cdecl Handle_S_HIT(class std::shared_ptr<class PacketSession> &,class Protocol::S_HIT &)" (?Handle_S_HIT@@YA_NAEAV?$shared_ptr@VPacketSession@@@std@@AEAVS_HIT@Protocol@@@Z) referenced in function "public: __cdecl `public: static void __cdecl ClientPacketHandler::Init(void)'::`2'::<lambda_9>::operator()(class std::shared_ptr<class PacketSession> &,unsigned char *,int)const " (??R<lambda_9>@?1??Init@ClientPacketHandler@@SAXXZ@QEBA@AEAV?$shared_ptr@VPacketSession@@@std@@PEAEH@Z)
+F:\Perforce\Server\Server\Binary\Debug\DummyClient.exe : fatal error LNK1120: 8 unresolved externals
