@@ -3,8 +3,8 @@
 
 #include "Team_AIBushCollision.h"
 #include "Components/BoxComponent.h"
-#include "CharacterController.h"
-#include "GameCharacter.h"
+#include "Character/CharacterController.h"
+#include "Character/GameCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 // Sets default values
 ATeam_AIBushCollision::ATeam_AIBushCollision()

@@ -10,7 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 
 ATeam_AICharacter::ATeam_AICharacter()
 {

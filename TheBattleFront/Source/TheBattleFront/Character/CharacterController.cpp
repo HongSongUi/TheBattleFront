@@ -8,17 +8,16 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Engine/World.h"
 #include "InputCoreTypes.h"
-#include "Projectile.h"
+#include "Weapon/Projectile.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
-#include "Weapon.h"
 #include "Engine/EngineTypes.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Materials/MaterialParameterCollection.h"
-#include "HUDWidget.h"
-#include "MouseWidget.h"
+#include "Widget/HUDWidget.h"
+#include "Widget/MouseWidget.h"
 // Server
 #include "NetworkManager.h"
 #include "ClientPacketHandler.h"
@@ -144,13 +143,6 @@ void ACharacterController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(CameraReset, ETriggerEvent::Started, this, &ACharacterController::CameraRotationReset);
 		EnhancedInputComponent->BindAction(AbilityChooseAction, ETriggerEvent::Started, this, &ACharacterController::AbilityChoose);
 		EnhancedInputComponent->BindAction(WorldMapToggle, ETriggerEvent::Started, this, &ACharacterController::WorldMapWidgetToggle);
-		
-		//Test Code
-		/*
-		EnhancedInputComponent->BindAction(LevelUpAction, ETriggerEvent::Started, this, &ACharacterController::LevelUp);
-		EnhancedInputComponent->BindAction(ExpUpAction, ETriggerEvent::Started, this, &ACharacterController::ExpUp);
-		*/
-		/////////////////////
 	}
 }
 
@@ -428,25 +420,6 @@ void ACharacterController::WorldMapWidgetToggle()
 	GameCharacter->GetHUDWidget()->ToggleWorldMap();
 }
 
-
-/// test function
-/*
-void ACharacterController::LevelUp(const FInputActionValue& Value)
-{
-	int32 PlayerLevel = GameCharacter->GetCharacterLevel();
-	PlayerLevel++;
-	GameCharacter->SetNewLevel(PlayerLevel);
-}
-
-void ACharacterController::ExpUp(const FInputActionValue& Value)
-{
-	bool fPush = Value.Get<bool>();
-	if (fPush == true)
-	{
-		GameCharacter->ExpUp(500);
-	}
-}
-*/
 UNetworkManager* ACharacterController::GetNetworkManager() const
 {
 	return GetGameInstance()->GetSubsystem<UNetworkManager>();

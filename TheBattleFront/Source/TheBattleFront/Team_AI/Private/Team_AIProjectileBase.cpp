@@ -6,7 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 #include "Team_AIGameMode.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Protocol.pb.h"
 
 // Sets default values

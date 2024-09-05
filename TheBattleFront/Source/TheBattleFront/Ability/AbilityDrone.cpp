@@ -11,7 +11,7 @@
 #include "DrawDebugHelpers.h"
 #include "TheBattleFront.h"
 #include "Team_AIGameMode.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AAbilityDrone::AAbilityDrone()

@@ -3,7 +3,7 @@
 
 #include "Team_AISpawnPointPlayer.h"
 #include "Team_AIGameMode.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 
 ATeam_AISpawnPointPlayer::ATeam_AISpawnPointPlayer()
 {

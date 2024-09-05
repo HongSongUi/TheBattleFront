@@ -3,7 +3,7 @@
 
 #include "Team_AIAnimInstance_Boss.h"
 #include "Team_AICharacter_Boss.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "NetworkManager.h"
 #include "Team_AIGameMode.h"
 #include "Particles/ParticleSystemComponent.h"

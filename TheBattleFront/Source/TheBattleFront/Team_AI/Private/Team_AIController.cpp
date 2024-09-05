@@ -13,7 +13,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Damage.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 
 const FName ATeam_AIController::SpawnPosKey(TEXT("SpawnPos"));
 const FName ATeam_AIController::PatrolPosKey(TEXT("PatrolPos"));

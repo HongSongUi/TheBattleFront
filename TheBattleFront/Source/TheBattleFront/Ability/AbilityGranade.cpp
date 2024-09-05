@@ -10,7 +10,7 @@
 #include "TheBattleFront.h"
 #include "Protocol.pb.h"
 #include "NetworkManager.h"
-#include "GameCharacter.h"	
+#include "Character/GameCharacter.h"	
 AAbilityGranade::AAbilityGranade()
 {
 

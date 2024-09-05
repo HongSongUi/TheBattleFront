@@ -7,28 +7,27 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "HUDWidget.h"
+#include "Widget/HUDWidget.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/Texture2D.h"
-#include "../../Team_AI/Public/Team_AIGameInstance.h" // ...?
+#include "../../Team_AI/Public/Team_AIGameInstance.h" 
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Weapon_Pistol.h"
-#include "AbilityManager.h"
-#include "AbilityBomb.h"
+#include "Weapon/Weapon.h"
+#include "Ability/AbilityManager.h"
 #include "NetworkManager.h"
 #include "CharacterAnimInstance.h"
 #include "Team_AIGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "TheBattleFront.h"
 #include "CharacterController.h"
-#include "HealthBar.h"
+#include "Widget/HealthBar.h"
 #include "Components/WidgetComponent.h"
 #include "PaperSpriteComponent.h"
-#include "DamageTextActor.h"
+#include "Widget/DamageTextActor.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/SceneCapture2D.h"
@@ -150,7 +149,7 @@ void AGameCharacter::Tick(float DeltaTime)
 	}
 	AbilityManager->Attack();
 
-	///CheckExp(CharacterStat.CurrExp); // ���� �̺�Ʈ �������� �ٲٰ� �ʹ�...
+
 
 
 //Add Server
@@ -190,7 +189,6 @@ void AGameCharacter::Tick(float DeltaTime)
 			FRotator rot(0, DestInfo->yaw(), 0);
 			SetActorRotation(rot);
 			SetActorLocation(loc);
-			//test
 		}
 		bReceived = false;
 		AimYaw = DestInfo->aimyaw();
@@ -228,12 +226,7 @@ void AGameCharacter::CharacterMaxHpUp(float value)
 	{
 		HealthBar->SetPercentage(CharacterStat.MaxHP, CharacterStat.CurrHP);
 	}
-	/*
-	if (ItemEquipSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, ItemEquipSound, GetActorLocation());
-	}
-	*/
+
 	Protocol::C_EATITEM_MAXHPUP maxHpPkt;
 	{
 		maxHpPkt.set_object_id(this->PlayerInfo->object_id());
@@ -292,12 +285,7 @@ void AGameCharacter::CharacterEatItem(float value)
 	}
 	if (MainHUD)
 		MainHUD->UpdateHpBar(CharacterStat.MaxHP, CharacterStat.CurrHP);
-	/*
-	if (ItemEquipSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, ItemEquipSound, GetActorLocation());
-	}
-	*/
+
 	if (HealthBar != nullptr)
 	{
 		HealthBar->SetPercentage(CharacterStat.MaxHP, CharacterStat.CurrHP);

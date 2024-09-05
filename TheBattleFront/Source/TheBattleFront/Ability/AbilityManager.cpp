@@ -8,7 +8,7 @@
 #include "AbilityChemical.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/SphereComponent.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Team_AIGameMode.h"

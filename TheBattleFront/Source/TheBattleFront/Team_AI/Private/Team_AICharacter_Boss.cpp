@@ -12,7 +12,7 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "BehaviorTree/BTTaskNode.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 //#include "GameFramework/PawnMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 

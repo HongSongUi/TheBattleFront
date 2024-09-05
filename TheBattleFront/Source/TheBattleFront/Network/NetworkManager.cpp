@@ -7,7 +7,7 @@
 #include "ClientPacketHandler.h"
 #include "Kismet/GameplayStatics.h"
 #include "Team_AIGameMode.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 //#include "Projectile.h"
 //#include "CharacterController.h"
 //#include "Weapon.h"
@@ -16,7 +16,7 @@
 //#include "GenericPlatform/GenericPlatformMisc.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "RunExternalExe.h"
-#include "ChooseHostWidget.h"
+#include "Widget/ChooseHostWidget.h"
 
 
 UNetworkManager::UNetworkManager()

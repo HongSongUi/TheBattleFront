@@ -5,7 +5,7 @@
 #include "Team_AIController.h"
 #include "Team_AICharacterBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

@@ -8,7 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Protocol.pb.h"
 #include "NetworkManager.h"
 

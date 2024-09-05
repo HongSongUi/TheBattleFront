@@ -4,7 +4,7 @@
 #include "Projectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Perception/AISenseConfig_Damage.h"
 #include "NetworkManager.h"
 #include "Team_AIGameMode.h"

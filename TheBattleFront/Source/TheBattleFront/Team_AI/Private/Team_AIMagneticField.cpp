@@ -8,7 +8,7 @@
 #include "NetworkManager.h"
 #include "Protocol.pb.h"
 #include "Team_AIGameMode.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 
 // Sets default values
 ATeam_AIMagneticField::ATeam_AIMagneticField()

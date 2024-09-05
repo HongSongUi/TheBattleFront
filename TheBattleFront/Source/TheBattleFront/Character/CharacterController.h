@@ -42,12 +42,6 @@ protected:
 
 	void WorldMapWidgetToggle();
 
-	/*Test Code*/
-	/*
-	void LevelUp(const FInputActionValue& Value);
-	void ExpUp(const FInputActionValue& Value);
-	*/
-	/******************************************/
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
@@ -82,14 +76,7 @@ private:
 		bool bIsPlayerDeath;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UUserWidget> MouseCursorClass;
-	// Test Code
-		/*
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-		class  UInputAction* LevelUpAction;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-		class  UInputAction* ExpUpAction;
-		*/
-	/*****************************************/
+
 	UPROPERTY(EditAnywhere)
 	class AGameCharacter* GameCharacter;
 	UPROPERTY()

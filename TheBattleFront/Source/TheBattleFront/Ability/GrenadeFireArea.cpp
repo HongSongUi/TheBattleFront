@@ -3,11 +3,11 @@
 
 #include "GrenadeFireArea.h"
 #include "Components/SphereComponent.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Engine/EngineTypes.h"
-#include "GameCharacter.h"
+
 // Sets default values
 AGrenadeFireArea::AGrenadeFireArea()
 {

@@ -10,11 +10,11 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 
 #include "Protocol.pb.h"
 #include "NetworkManager.h"
-#include "GameCharacter.h"	
+
 
 AAbilityChemical::AAbilityChemical()
 {

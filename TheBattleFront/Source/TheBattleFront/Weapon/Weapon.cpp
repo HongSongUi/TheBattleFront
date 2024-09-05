@@ -5,7 +5,7 @@
 #include "Projectile.h"
 #include "Kismet/GameplayStatics.h"
 #include "NetworkManager.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Particles/ParticleSystemComponent.h"
 // Sets default values
 AWeapon::AWeapon()

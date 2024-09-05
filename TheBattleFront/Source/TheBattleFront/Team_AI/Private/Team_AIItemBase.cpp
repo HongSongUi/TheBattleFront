@@ -3,7 +3,7 @@
 
 #include "Team_AIItemBase.h"
 #include "Components/BoxComponent.h"
-#include "GameCharacter.h"
+#include "Character/GameCharacter.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Materials/MaterialInstance.h"
 #include "Components/PrimitiveComponent.h"

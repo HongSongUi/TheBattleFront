@@ -2,7 +2,7 @@
 
 
 #include "WorldMapWidget.h"
-#include "CharacterController.h"
+#include "Character/CharacterController.h"
 
 void UWorldMapWidget::NativeConstruct()
 {
