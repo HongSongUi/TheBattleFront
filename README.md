@@ -26,3 +26,11 @@
 * 이동 : 키보드 W, A, S, D
 * 공격 : 마우스 좌 클릭
 
+|  |   |
+|---|---|
+|시작 화면|접속 완료|
+|<img width="450" alt="image" src="https://github.com/user-attachments/assets/a1803763-faaa-422c-94bd-88fde25b1ac9">|<img width="450" alt="image" src="https://github.com/user-attachments/assets/b3331a0f-41f4-455d-ba16-b96a9e1f475c">|
+|인게임 화면1|인게임 화면2|
+|<img width="450" alt="image" src="https://github.com/user-attachments/assets/1a63e357-bac7-46cc-ac1a-f75e14725d67">|<img width="450" alt="image" src="https://github.com/user-attachments/assets/3d617a05-a591-44e2-a82e-8690e646cd2a">|
+|맵과 미니맵| 결과 화면 |
+|<img width="450" alt="image" src="https://github.com/user-attachments/assets/d4a66f3a-0e22-46ac-b13c-5c928375a21a"> |<img width="450" alt="image" src="https://github.com/user-attachments/assets/e5efa3e2-f82e-47bd-bea2-aeb36137c638">
