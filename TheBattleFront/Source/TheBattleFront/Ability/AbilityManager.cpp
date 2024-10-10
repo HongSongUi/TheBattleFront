@@ -13,7 +13,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Team_AIGameMode.h"
 
-// ToDo : SelectedAbility ������ �� �����
 
 // Sets default values
 AAbilityManager::AAbilityManager()
@@ -77,7 +76,6 @@ void AAbilityManager::Attack()
 {
 	for (auto AbilityData : AbilityClassArray)
 	{
-		//AbilityData.GetDefaultObject()->SetOwner(GetOwner());
 		AbilityType Type = AbilityData.GetDefaultObject()->GetType();
 		if (AbilityData.GetDefaultObject()->CheckTime(GetWorld()->GetDeltaSeconds()))
 		{
