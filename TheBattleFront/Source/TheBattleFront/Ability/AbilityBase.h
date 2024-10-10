@@ -44,8 +44,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void Attack(FVector& Location) { return; };// �� ����
-	virtual void Attack() { return; };// �� ����
+	virtual void Attack(FVector& Location) { return; };
+	virtual void Attack() { return; };
 	virtual bool CheckTime(float DTimer);
 	virtual int32 GetProjCount() { return 0; };
 	virtual AbilityType GetType();
