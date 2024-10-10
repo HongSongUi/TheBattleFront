@@ -81,7 +81,6 @@ void AAbilityDrone::SetLocation(FVector& Location, int abilityIdx)
 	
 	
 	TargetDistance = (TargetLocation - StartLocation).Size();
-	//DrawDebugSphere(GetWorld(), TargetLocation, 200, 26, FColor(181, 0, 0), true, -1, 0, 2);
 	Direction = (TargetLocation - StartLocation).GetSafeNormal();
 
 

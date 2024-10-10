@@ -61,7 +61,6 @@ void AAbilityBomb::Tick(float DeltaTime)
 
 void AAbilityBomb::SetLocation(FVector& Location, int abilityIdx)
 {
-	//FVector Loc = FVector::ZeroVector;
 	float X_Max = Location.X + 500.f;
 	float Y_Max = Location.Y + 500.f;
 	float X_Min = Location.X - 500.f;
@@ -72,9 +71,9 @@ void AAbilityBomb::SetLocation(FVector& Location, int abilityIdx)
 	Location.Y = Y_Rand;
 	Location.Z += 1000.f;
 	SetActorLocation(Location);
-	//CapsuleCompoent->SetGenerateOverlapEvents(true);
+	
 
-	Protocol::C_PLAYERSKILL_BOMB bombPkt;
+	Protocol::C_PLAYERSKILL_BOMB bombPkt; // server
 	{
 		auto player = Cast<AGameCharacter>(GetOwner());
 		bombPkt.set_object_id(player->PlayerInfo->object_id());
