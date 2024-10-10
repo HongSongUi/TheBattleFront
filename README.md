@@ -6,7 +6,7 @@
 
 * 개발 기간 : 2024.03 - 2024.06
 * 팀원 : 1 서버 프로그래머 + 2 클라이언트 프로그래머
-* 담당 : 캐릭터, 스킬, UI
+* 담당 : [캐릭터](https://github.com/HongSongUi/TheBattleFront/tree/main/TheBattleFront/Source/TheBattleFront/Character), [스킬](https://github.com/HongSongUi/TheBattleFront/tree/main/TheBattleFront/Source/TheBattleFront/Ability), [UI](https://github.com/HongSongUi/TheBattleFront/tree/main/TheBattleFront/Source/TheBattleFront/Widget), [무기](https://github.com/HongSongUi/TheBattleFront/tree/main/TheBattleFront/Source/TheBattleFront/Weapon)
 
 
 ## Game Overview
