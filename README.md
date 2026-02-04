@@ -10,4 +10,4 @@
 
 
 ## 상세 내용
-[노션](https://pickled-saver-987.notion.site/TheBattleFront-2e823b8d49dc80f88d4be38badf3e618)
+[노션](https://pickled-saver-987.notion.site/The-Battle-Front-2fd23b8d49dc8050a6c4fe654410f53c?pvs=143)
